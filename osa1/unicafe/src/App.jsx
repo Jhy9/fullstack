@@ -1,76 +1,53 @@
 import { useState } from 'react'
 
-const Header = ({title}) => <h2>{title}</h2>
 
-const Button = ({handleClick,text}) => (
-  <button onClick= {handleClick}>
-    {text}
-  </button>
-)
-const Statistics =(props) => {
-  const count =  props.feed.counts[0].count+props.feed.counts[1].count+props.feed.counts[2].count
-  if (count == 0){
+const Statistics = (props) => {
+  if(props.total === 0){
+    return (
+      <div>No feedback given</div>
+    )
+  } else{
     return(
-      <div>
-        <p>No feedback given</p>
-      </div>
+      <table> 
+        <tbody>
+          <StatisticsLine text="good" value={props.good}/>
+          <StatisticsLine text="neutral" value={props.neutral}/>
+          <StatisticsLine text="bad" value={props.bad}/>
+          <StatisticsLine text="average" value={(props.good-props.bad)/(props.total)}/>
+          <StatisticsLine text="positive" value={props.good/props.total*100} t2="%"/>
+        </tbody>
+      </table>
     )
   }
-  return(
-    <div>
-      <table>
-        <tbody>
-          <StatisticLine text={props.feed.counts[0].feedback} value={props.feed.counts[0].count} /> 
-          <StatisticLine text={props.feed.counts[1].feedback} value={props.feed.counts[1].count} /> 
-          <StatisticLine text={props.feed.counts[2].feedback} value={props.feed.counts[2].count} /> 
-          <StatisticLine text="all" value={count} /> 
-          <StatisticLine text="average" value={(props.feed.counts[0].count-props.feed.counts[2].count)/count} /> 
-          <StatisticLine text="positive" value={(props.feed.counts[0].count)/count*100} extra = "%" />
-        </tbody>
-      </table> 
-    </div>
-  )
 }
-const StatisticLine=(props)=>{
-  return(
-    <tr>
-      <td>{props.text}</td>
-      <td>{props.value} {props.extra}</td>
-    </tr>
-  )
-}
+const StatisticsLine=(props)=>{return (<tr><td>{props.text}</td><td>{props.value} {props.t2}</td></tr>)}
+
 const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
+  const [total, setTotal] = useState(0)
 
-  const stats = {
-    counts:[
-      {feedback:'good', count:good},
-      {feedback:'neutral', count:neutral},
-      {feedback:'bad', count:bad},
-    ]
+  const Feedback = (review) =>()=>{
+    if(review == 'good'){
+      setGood(good+1)
+    }else if(review == 'bad'){
+      setBad(bad+1)
+    } else{
+      setNeutral(neutral+1)
+    }
+    setTotal(total+1)
   }
+  const Button=(props)=>{return(<button onClick={Feedback(props.fb)}>{props.fb}</button>)}
 
-  const addGood=()=>setGood(good + 1)
- 
-  const addNeutral=()=>setNeutral(neutral + 1)
-
-  const addBad=()=>setBad(bad + 1)
-  
   return (
     <div>
-      <Header title="give feedback"/>
-
-      <p>
-      <Button handleClick={addGood} text="good" />
-      <Button handleClick={addNeutral} text="neutral" />
-      <Button handleClick={addBad} text="bad" />
-      </p>
-
-      <Header title="statistics"/>
-      
-      <Statistics feed={stats}/>
+      <h1>give feedback</h1>
+      <Button fb ='good'/>
+      <Button fb ='neutral'/>
+      <Button fb ='bad'/>
+      <h1>statistics</h1>
+      <Statistics good={good} bad={bad} neutral={neutral} total={total}/>
     </div>
   )
 }

@@ -1,4 +1,13 @@
-import Course from './Course'
+import Course from './components/Course'
+
+const Courses = (props) =>
+  <ul>
+    {props.courses.map(course=>
+      <li key= {course.id}>
+        {Course(course)}
+      </li>
+    )}
+  </ul>
 
 const App = () => {
   const courses = [
@@ -48,8 +57,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Web developlment curriculum</h1>
-      <Course course={courses} />
+      <Courses courses={courses} />
     </div>
   )
 }
